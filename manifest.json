@@ -1,0 +1,15 @@
+{
+  "name": "Hinário PAV SG",
+  "short_name": "Hinário PAV SG",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0056b3",
+  "theme_color": "#0056b3",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
