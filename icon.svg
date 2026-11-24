@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0056b3" rx="115"/><path fill="#ffffff" d="M336 176h-80c-8.8 0-16 7.2-16 16v129.4c-8.5-5.3-18.7-8.4-29.6-8.4-30.9 0-56 25.1-56 56s25.1 56 56 56 56-25.1 56-56V240h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16z"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0056b3"/>
+  <text x="256" y="330" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="280" font-weight="700" fill="#fff">P</text>
+</svg>
