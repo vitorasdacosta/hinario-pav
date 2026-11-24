@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0056b3">
+    <link rel="manifest" href="manifest.json">
+    <title>Hinário Digital PAV</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --light: #f4f4f9;
+            --dark: #333;
+            --white: #ffffff;
+            --gray: #666;
+        }
+
+        body.dark-mode {
+            --primary: #4da3ff;
+            --light: #121212;
+            --dark: #f4f4f9;
+            --white: #1e1e1e;
+            --gray: #aaaaaa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+            color: var(--dark);
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #search-box {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--gray);
+            border-radius: 25px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+            background-color: var(--white);
+            color: var(--dark);
+        }
+
+        #search-box:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.2);
+        }
+
+        #hymn-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hymn-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid transparent;
+        }
+
+        .hymn-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        .hymn-info h3 {
+            margin: 0 0 5px;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .hymn-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .badges {
+            display: flex;
+            gap: 5px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .badge-fem {
+            background-color: #e91e63;
+            color: white;
+        }
+
+        .badge-masc {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        #hymn-detail {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--light);
+            z-index: 100;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .links-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .btn-cifra {
+            background-color: #ff9800;
+        }
+
+        .btn-youtube {
+            background-color: #f44336;
+        }
+
+        .lyrics-container {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 300px;
+            white-space: pre-wrap;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        textarea#lyrics-editor {
+            width: 100%;
+            height: 300px;
+            font-family: inherit;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .action-bar {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        button.action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Hinário Digital</h1>
+        <h2>PAV SG</h2>
+        <button id="theme-toggle" onclick="toggleTheme()"
+            style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: transparent; border: 1px solid var(--white); color: var(--white); padding: 8px; border-radius: 50%; cursor: pointer;"
+            title="Alternar Modo Escuro">🌙</button>
+    </header>
+
+    <main id="main-view" class="container">
+        <input type="search" id="search-box" placeholder="Buscar por nome, banda ou trecho..." autocomplete="off">
+        <ul id="hymn-list"></ul>
+    </main>
+
+    <div id="hymn-detail">
+        <div class="container">
+            <div class="detail-header">
+                <button class="btn-back" onclick="closeDetail()">← Voltar</button>
+                <h2 id="detail-title" style="margin:0; font-size:1.2rem; text-align:right;">Título</h2>
+            </div>
+
+            <div id="detail-meta">
+                <p><strong>Banda:</strong> <span id="detail-band"></span></p>
+                <div class="badges" style="margin: 10px 0;">
+                    <span id="detail-key-fem" class="badge badge-fem"></span>
+                    <span id="detail-key-masc" class="badge badge-masc"></span>
+                </div>
+            </div>
+
+            <div class="links-area">
+                <a id="link-cifra" href="#" target="_blank" rel="noopener noreferrer" class="btn-link btn-cifra hidden">Ver Cifra</a>
+                <a id="link-youtube" href="#" target="_blank" rel="noopener noreferrer" class="btn-link btn-youtube hidden">Ouvir Youtube</a>
+            </div>
+
+            <hr>
+
+            <h3>Letra</h3>
+            <div id="lyrics-display" class="lyrics-container">
+                <em>Nenhuma letra cadastrada. Clique em editar para adicionar.</em>
+            </div>
+            <textarea id="lyrics-editor" placeholder="Cole a letra da música aqui..."></textarea>
+
+            <div class="action-bar">
+                <button id="btn-edit" class="action-btn" onclick="toggleEdit()">✎ Editar Letra</button>
+                <button id="btn-save" class="action-btn hidden" onclick="saveLyrics()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="hinos.js"></script>
+    <script>
+        let rawData = typeof hinosData !== 'undefined' ? hinosData : [];
+        let currentSong = null;
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('pav_dark_mode', isDark);
+            updateThemeButton(isDark);
+        }
+
+        function updateThemeButton(isDark) {
+            const btn = document.getElementById('theme-toggle');
+            if (btn) btn.innerText = isDark ? '☀️' : '🌙';
+        }
+
+        if (localStorage.getItem('pav_dark_mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            updateThemeButton(true);
+        }
+
+        function renderList(songs) {
+            const list = document.getElementById('hymn-list');
+            list.innerHTML = '';
+
+            songs.forEach((song) => {
+                const li = document.createElement('li');
+                li.className = 'hymn-card';
+                li.onclick = () => showSong(song);
+
+                li.innerHTML = `
+                    <div class="hymn-info">
+                        <h3>${escapeHtml(song.nome)}</h3>
+                        <p>${escapeHtml(song.banda || 'Desconhecido')}</p>
+                    </div>
+                    <div class="badges">
+                        ${song.tom_fem ? `<span class="badge badge-fem">${escapeHtml(song.tom_fem)}</span>` : ''}
+                        ${song.tom_masc ? `<span class="badge badge-masc">${escapeHtml(song.tom_masc)}</span>` : ''}
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function escapeHtml(value) {
+            const element = document.createElement('span');
+            element.textContent = value == null ? '' : String(value);
+            return element.innerHTML;
+        }
+
+        function showSong(song) {
+            currentSong = song;
+
+            document.getElementById('detail-title').innerText = song.nome;
+            document.getElementById('detail-band').innerText = song.banda;
+
+            const badgeFem = document.getElementById('detail-key-fem');
+            const badgeMasc = document.getElementById('detail-key-masc');
+
+            if (song.tom_fem) {
+                badgeFem.innerText = 'Fem: ' + song.tom_fem;
+                badgeFem.style.display = 'inline-block';
+            } else {
+                badgeFem.style.display = 'none';
+            }
+
+            if (song.tom_masc) {
+                badgeMasc.innerText = 'Masc: ' + song.tom_masc;
+                badgeMasc.style.display = 'inline-block';
+            } else {
+                badgeMasc.style.display = 'none';
+            }
+
+            const linkCifra = document.getElementById('link-cifra');
+            const linkYoutube = document.getElementById('link-youtube');
+
+            if (song.cifra) {
+                linkCifra.href = song.cifra;
+                linkCifra.classList.remove('hidden');
+            } else {
+                linkCifra.classList.add('hidden');
+            }
+
+            if (song.youtube) {
+                linkYoutube.href = song.youtube;
+                linkYoutube.classList.remove('hidden');
+            } else {
+                linkYoutube.classList.add('hidden');
+            }
+
+            loadLyrics(song.nome);
+            document.getElementById('hymn-detail').style.display = 'block';
+            document.getElementById('main-view').style.display = 'none';
+        }
+
+        function closeDetail() {
+            document.getElementById('hymn-detail').style.display = 'none';
+            document.getElementById('main-view').style.display = 'block';
+            document.getElementById('lyrics-display').classList.remove('hidden');
+            document.getElementById('lyrics-editor').style.display = 'none';
+            document.getElementById('btn-edit').classList.remove('hidden');
+            document.getElementById('btn-save').classList.add('hidden');
+        }
+
+        function loadLyrics(songName) {
+            const savedLyrics = localStorage.getItem('pav_lyrics_' + songName);
+            const display = document.getElementById('lyrics-display');
+
+            if (savedLyrics && savedLyrics.trim() !== '') {
+                display.innerText = savedLyrics;
+            } else {
+                display.innerHTML = '<em>Nenhuma letra cadastrada. Clique em editar para adicionar.</em>';
+            }
+        }
+
+        function toggleEdit() {
+            const display = document.getElementById('lyrics-display');
+            const editor = document.getElementById('lyrics-editor');
+            const savedLyrics = localStorage.getItem('pav_lyrics_' + currentSong.nome);
+
+            editor.value = savedLyrics && savedLyrics.trim() !== '' ? savedLyrics : '';
+            display.classList.add('hidden');
+            editor.style.display = 'block';
+            document.getElementById('btn-edit').classList.add('hidden');
+            document.getElementById('btn-save').classList.remove('hidden');
+        }
+
+        function saveLyrics() {
+            if (!currentSong) return;
+
+            const content = document.getElementById('lyrics-editor').value;
+            localStorage.setItem('pav_lyrics_' + currentSong.nome, content);
+            loadLyrics(currentSong.nome);
+
+            document.getElementById('lyrics-display').classList.remove('hidden');
+            document.getElementById('lyrics-editor').style.display = 'none';
+            document.getElementById('btn-edit').classList.remove('hidden');
+            document.getElementById('btn-save').classList.add('hidden');
+        }
+
+        document.getElementById('search-box').addEventListener('input', (event) => {
+            const term = event.target.value.toLowerCase();
+            const filtered = rawData.filter((song) => {
+                const nomeMatch = (song.nome || '').toLowerCase().includes(term);
+                const bandaMatch = (song.banda || '').toLowerCase().includes(term);
+                const savedLyrics = localStorage.getItem('pav_lyrics_' + song.nome) || '';
+                const letraMatch = savedLyrics.toLowerCase().includes(term);
+                return nomeMatch || bandaMatch || letraMatch;
+            });
+            renderList(filtered);
+        });
+
+        renderList(rawData);
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .catch((error) => console.log('Falha ao registrar SW:', error));
+            });
+        }
+    </script>
+</body>
+
+</html>
